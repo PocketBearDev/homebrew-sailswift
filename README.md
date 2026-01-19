@@ -19,7 +19,7 @@ brew upgrade --cask sailswift
 
 ```bash
 brew uninstall --cask sailswift
-brew untap PocketBear/sailswift
+brew untap PocketBearDev/sailswift
 ```
 
 ## About Sailswift
