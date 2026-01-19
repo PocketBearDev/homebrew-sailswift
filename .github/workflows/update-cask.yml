@@ -1,0 +1,65 @@
+name: Update Cask
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to update to (e.g., 1.0.1)'
+        required: true
+        type: string
+
+  # Triggered from Sailswift repo via repository_dispatch
+  repository_dispatch:
+    types: [update-cask]
+
+jobs:
+  update:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION="${{ github.event.client_payload.version }}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Updating to version: $VERSION"
+
+      - name: Download and get SHA256
+        id: sha
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          curl -sL "https://github.com/proverbiallemon/Sailswift/releases/download/v${VERSION}/Sailswift-${VERSION}.zip" -o /tmp/Sailswift.zip
+          SHA256=$(shasum -a 256 /tmp/Sailswift.zip | cut -d' ' -f1)
+          echo "sha256=$SHA256" >> $GITHUB_OUTPUT
+          echo "SHA256: $SHA256"
+
+      - name: Update cask formula
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          SHA256="${{ steps.sha.outputs.sha256 }}"
+
+          # Update version
+          sed -i '' "s/version \".*\"/version \"${VERSION}\"/" Casks/sailswift.rb
+
+          # Update sha256
+          sed -i '' "s/sha256 \".*\"/sha256 \"${SHA256}\"/" Casks/sailswift.rb
+
+          echo "Updated Casks/sailswift.rb:"
+          cat Casks/sailswift.rb
+
+      - name: Commit and push
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/sailswift.rb
+          git commit -m "Update sailswift to v${VERSION}"
+          git push
