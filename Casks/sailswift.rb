@@ -7,7 +7,7 @@ cask "sailswift" do
   desc "Native macOS mod manager for Ship of Harkinian"
   homepage "https://github.com/proverbiallemon/Sailswift"
 
-  depends_on macos: ">= :ventura"
+  depends_on macos: :ventura
 
   app "Sailswift.app"
 
