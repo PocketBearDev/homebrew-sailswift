@@ -1,6 +1,6 @@
 cask "sailswift" do
-  version "1.1.4"
-  sha256 "8ba4dfd71d20a32187016effc6200a5b2b0786fc95cafb4710b9eced7a60164f"
+  version "1.1.5"
+  sha256 "8476b2aadcd6c2e1e68596e775ff49c12fee177483a31119725a16aaa6701e14"
 
   url "https://github.com/proverbiallemon/Sailswift/releases/download/v#{version}/Sailswift-#{version}.zip"
   name "Sailswift"
